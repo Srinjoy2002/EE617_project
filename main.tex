@@ -22,11 +22,11 @@ Acoustic Signals for Air Compressors\\
 \large A concise report based on Verma \textit{et al.}, IEEE Trans. on Reliability (2016)}
 \author{Srinjoy Chakraborty}
 \date{\today}
-\maketitle
-\begin{document}
+\begin{document} % <-- must come first
+\maketitle % generates the title
 \newpage
-\tableofcontents
-\listoffigures
+\tableofcontents % table of contents
+\listoffigures % table of figures
 \newpage
 \begin{multicols}{2}
 \section{Abstract}
@@ -61,7 +61,7 @@ The main contributions of this work can be summarized as follows:
 \begin{multicols}{2}
 
 The above diagram ~\ref{fig:sysarch} shows the overall system architecture. The flow contains 6 steps (1) Data Acquisition using microphones $\rightarrow$ Raw Signal, (2) Pre-processing, (3) Feature Extraction, (4) Feature Selection, (5) Classification $\rightarrow$ SVM, (6) Testing and Validation.
-The rest of this report is organized as follows. Section~\ref{sec:daq} describes the data acquisition setup and recording protocol. Section~\ref{sec:preprocess} summarizes the preprocessing steps used prior to decomposition. Section~\ref{sec:emd} presents the EMD algorithm and criteria for IMF selection. Section~\ref{sec:features} outlines the feature extraction and selection methods, and Section~\ref{sec:classification} describes the classification strategy. Experimental results and analysis are reported in Section~\ref{sec:results}, followed by conclusions and directions for future work in Section~\ref{sec:conclusion}. The DAQ setup and specific implementation details follow the experimental design in \cite{Verma2016}.
+The rest of this report is organized as follows. Section~\ref{sec:daq} describes the data acquisition setup and recording protocol. Section~\ref{sec:preprocess} summarizes the preprocessing steps used prior to decomposition. Section~\ref{sec:features} outlines the feature extraction and selection methods, and Section~\ref{sec:classification} describes the classification strategy. Experimental results and analysis are reported in Section~\ref{sec:results}, followed by conclusions and directions for future work in Section~\ref{sec:conclusion}. The DAQ setup and specific implementation details follow the experimental design in \cite{Verma2016}.
 
 \section{Data Acquisition (DAQ) System}
 \label{sec:daq}
@@ -82,11 +82,12 @@ This study used acoustic recordings to capture machine condition signatures. The
 \subsubsection{Preliminary observations}
 Practical tests revealed:
 \begin{itemize}
-    \item Microphones placed at roughly \SI{1.5}{cm} from the machine provided stronger signals and reduced background contamination.
-    \item Acoustic useful content predominantly lies below \SI{12}{kHz} for the compressor under study \cite{Verma2016}; therefore, pre-processing included a high-pass filter (to remove fan hum) and a low-pass filter at \SI{12}{kHz}.
+    \item Microphones placed at roughly {1.5}{cm} from the machine provided stronger signals and reduced background contamination.
+    \item Acoustic useful content predominantly lies below {12}{kHz} for the compressor under study \cite{Verma2016}; therefore, pre-processing included a high-pass filter (to remove fan hum) and a low-pass filter at {12}{kHz}.
     \item A clipping strategy (segment selection) with overlap helps to choose the most stable portion of each recording for robust analysis (detailed in Section~\ref{sec:preprocess}).
 \end{itemize}
 \section{Pre-Processing}
+\label{sec:preprocess}
 \begin{itemize}
   \item \textbf{Useful bandwidth:} For this compressor, the informative acoustic content lies largely below 12 kHz; accordingly, later processing uses a low-pass cutoff around 12 kHz and a high-pass ``fan'' filter near 400 Hz to remove known background hums/noises.
   \item \textbf{Clipping} Each 5 s recording is split into 9, 1 s segments with 50\% overlap; the segment with the minimum standard deviation is selected for analysis to avoid transient spikes and to choose the most stable portion of the recording.
@@ -95,15 +96,16 @@ Practical tests revealed:
 \end{itemize}
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.85\linewidth]{preprocessing.png}
-    \caption{Enter Caption}
-    \label{fig:placeholder}
+    \includegraphics[width=1\linewidth]{Diagrams/preprocessing.png}
+    \caption{Preprocessing steps}
+    \label{fig:preprocessing steps}
 \end{figure}
-\section{Feature Selection}
+\section{Feature Extraction}
 \subsection{1.}
 \subsection{2.}
 \subsection{3.}
 \section{Feature Selection}
+\label{sec:features}
 Principal Component Analysis (PCA) is a dimensionality reduction technique that
 transforms a large set of correlated features into a smaller set of uncorrelated
 variables, known as principal components. Each component is an orthogonal
@@ -125,36 +127,37 @@ approach ensures faster computation, reduces overfitting, and maintains the
 ability to distinguish between healthy and faulty compressor states.
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.85\linewidth]{pcavar.png}
+    \includegraphics[width=1\linewidth]{Diagrams/pcavar.png}
     \caption{PCA Variance}
-    \label{fig:placeholder}
+    \label{fig:PCA Variance}
 \end{figure}
 \section{Use Case}
 \subsection{Classes, labels and Test-Train Split}
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.85\linewidth]{split.png}
+    \includegraphics[width=1\linewidth]{Diagrams/split.png}
     \caption{test train split}
-    \label{fig:placeholder}
+    \label{fig:split}
 \end{figure}
 \subsection{techniques used}
 \subsection{SVM}
+\label{sec:classification}
 \section{Results}
+\label{sec:results}
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.85\linewidth]{res1.png}
+    \includegraphics[width=1\linewidth]{Diagrams/res1.png}
     \caption{OVA result}
-    \label{fig:placeholder}
+    \label{fig:ova}
 \end{figure}
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.85\linewidth]{res2.png}
+    \includegraphics[width=1\linewidth]{Diagrams/res2.png}
     \caption{OVO result}
-    \label{fig:placeholder}
+    \label{fig:ovo}
 \end{figure}
 \section{Conclusion}
-
-
+\label{sec:conclusion}
 \section*{References}
 \begin{thebibliography}{1}
 \bibitem{Verma2016}
