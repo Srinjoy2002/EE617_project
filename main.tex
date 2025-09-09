@@ -34,21 +34,17 @@ Acoustic Signals for Air Compressors\\
 \section{Abstract}
 Early detection of machine faults is vital to prevent costly downtime and ensure workplace safety, as the source is \cite{Verma2016}. This paper presents a practical, data-driven process for building acoustic-based fault-diagnosis systems for reciprocating air compressors. The proposed pipeline is deliberately end-to-end: it covers how to collect acoustic data, how to choose the best microphone location, how to clean and normalize the recordings, which time/frequency/time–frequency features to extract, how to pick a compact yet informative feature set, and how to train and evaluate classifiers for multi-state fault recognition using SVM.
 \section{Introduction}
-Rotating and reciprocating machines (compressors, motors, pumps) often show early warning signs in the form of acoustic or vibration signatures. Detecting faults early avoids costly downtime and safety hazards. Intelligent Condition-based monitoring (ICBM) aims to recognize incipient faults from sensory streams (acoustics, vibration, temperature, etc.) and thereby trigger maintenance before catastrophic failure. Acoustic measurements are especially attractive because they are typically easy to install and are relatively less sensitive to structural resonances compared to vibration sensors; however, acoustic recordings are often noisy and non-stationary, which makes automated analysis challenging.
+Rotating and reciprocating machines (compressors, motors, pumps) often show early warning signs of any incuring faults in the form of acoustic signals or vibrations. Detecting faults early avoids costly downtime and safety hazards. Intelligent Condition-based monitoring (ICBM) aims to recognize faults from sensor readings and hence trigger maintenance before any catastrophic failure. Acoustic measurements are especially used because they are typically easy to install and are relatively less sensitive to structural resonances compared to vibration sensors; however, acoustic recordings are often noisy and non-stationary, which makes automated analysis challenging.
+Acoustic monitoring in particular is attractive for many rotating and reciprocating machines because microphones are inexpensive, simple to deploy, and can capture fault-related signatures that are often complementary to vibration and electrical measurements. However, practical acoustic monitoring faces two recurring challenges: (1) recordings are frequently affected by environmental and operational noise, and (2) signal characteristics are non-stationary and may vary across sensor locations. These issues make it difficult to select robust sensor placements and to extract consistently informative features for automated fault diagnosis.
 
-Intelligent Condition-based monitoring (ICBM) is increasingly adopted in industry to detect early signs of machine degradation and to schedule maintenance before costly failures occur. Acoustic monitoring in particular is attractive for many rotating and reciprocating machines because microphones are inexpensive, simple to deploy, and can capture fault-related signatures that are often complementary to vibration and electrical measurements. However, practical acoustic monitoring faces two recurring challenges: (1) recordings are frequently contaminated by environmental and operational noise, and (2) signal characteristics are non-stationary and may vary across sensor locations. These issues make it difficult to select robust sensor placements and to extract consistently informative features for automated fault diagnosis.
+A frequently overlooked but critical stage in the monitoring processes is \emph{Sensitive Position Analysis} (SPA), which is the process of identifying where on the machine a sensor should be mounted to maximize fault detectability. Traditional SPA methods rely on straightforward statistics (e.g., RMS, peak, variance, etc. ) and on simple cross-correlation to avoid redundant locations. While effective in quiet and controlled settings, these techniques can fail when recordings are influenced by noise or disturbances. To make SPA robust in such realistic settings, a preprocessing approach that can separate meaningful signal components from noise and do so adaptively for non-stationary signals is required. The core idea is to combine Empirical Mode Decomposition (EMD) with conventional preprocessing, feature extraction, and principled feature selection so that SPA and subsequent classification operate on cleaner, more informative representations. EMD adaptively decomposes each recording into intrinsic mode functions (IMFs). By selecting IMFs that exhibit strong relevance to the recorded waveform (and discarding IMFs dominated by noise or numerical artifacts), we reconstruct a de-noised version of the acoustic signal. The remainder of the pipeline extracts a broad set of time, frequency, and time–frequency features, uses PCA and other feature selection techniques to obtain a feature matrix, and uses multiclass SVM for state recognition (healthy/ Leakage inlet valve (LIV)/Leakage outlet valve (LOV)/Non-return valve (NRV), Piston ring fault, Flywheel f ault, Rider belt fault, Bearing fault in our case).
 
-A frequently overlooked but critical stage in the monitoring pipeline is \emph{Sensitive Position Analysis} (SPA) — the process of identifying where on the machine a sensor should be mounted to maximize fault detectability. Traditional SPA methods rely on straightforward statistics (e.g., RMS, peak, variance) and on simple cross-correlation to avoid redundant locations. While effective in quiet and controlled settings, these techniques can fail when recordings are influenced by heterogeneous noise or transient disturbances. To make SPA robust in such realistic settings, a preprocessing approach that can separate meaningful signal components from noise — and do so adaptively for non-stationary signals — is required.
-
-This study proposes an end-to-end, data-driven pipeline that addresses these challenges. The core idea is to combine Empirical Mode Decomposition (EMD) with conventional preprocessing, feature extraction, and principled feature selection so that SPA and subsequent classification operate on cleaner, more informative representations. EMD adaptively decomposes each recording into intrinsic mode functions (IMFs). By selecting IMFs that exhibit strong relevance to the recorded waveform (and discarding IMFs dominated by noise or numerical artifacts), we reconstruct a denoised version of the acoustic signal. Computing the Hilbert envelope of this reconstructed signal and deriving compact statistics (RMS and absolute mean) provides stable ranking criteria that are less sensitive to transients and background noise. The remainder of the pipeline extracts a broad set of time, frequency, and time–frequency features, uses mutual-information and other feature-selection techniques to obtain a compact descriptor set, and employs multiclass SVMs for state recognition.
-
-The proposed approach is validated on a real single-stage reciprocating air compressor with eight distinct operating states (one healthy state and seven seeded faults). Key practical choices made in the study include a robust clipping/segment-selection strategy to avoid transients, a normalization routine that mitigates the influence of extreme samples, and an empirical selection of correlation thresholds for choosing relevant IMFs. Experiments demonstrate that, using recordings from a single optimally chosen microphone position, the pipeline reliably distinguishes the seeded faults and achieves high classification accuracy while keeping computational overhead manageable.
-
-The main contributions of this work can be summarized as follows:
+The proposed approach is validated on a real single-stage reciprocating air compressor with eight distinct operating states (one healthy state and seven faults).
+The main contributions of this work are as follows:
 \begin{itemize}
   \item An \textbf{EMD-based SPA} procedure that improves the robustness of sensor-position ranking under noisy and non-stationary conditions by reconstructing signals from relevant IMFs and using their Hilbert envelopes for ranking.
   \item A practical, reproducible DAQ and preprocessing protocol (filtering, clipping, smoothing, and robust normalization) that yields stable input for decomposition and feature extraction.
-  \item A comprehensive evaluation on a real compressor testbed showing that a compact feature set—selected via mutual-information-based techniques—combined with multiclass SVMs, can accurately identify multiple fault modes from a single microphone location.
+  \item A comprehensive evaluation on a real compressor dataset showing that a compact feature set selected via PCA and combined with multiclass SVM, can accurately identify multiple fault modes from a single microphone location.
 \end{itemize}
 \end{multicols}
 \begin{figure}[H]
@@ -69,9 +65,9 @@ This study used acoustic recordings to capture machine condition signatures. The
 
 \subsection{Hardware and placement}
 \begin{itemize}
-  \item \textbf{Microphones:} Unidirectional microphones were used to preferentially pick up sound directed toward each sensor and to reduce off-axis ambient noise.
+  \item \textbf{Microphones:} Microphones were used to preferentially pick up sound directed toward each sensor and to reduce off-axis ambient noise.
   \item \textbf{DAQ hardware:} Recordings were acquired using a National Instruments NI-9234 dynamic signal acquisition module (four channels, 24-bit) connected via an NI-9172 chassis to a PC running LabVIEW for capture and storage. This setup allows up to four simultaneous microphone channels at high sample rates.
-  \item \textbf{Sensor distance:} Empirical tests showed the cleanest and loudest captures when the microphone was placed approximately 1.5 cm from the machine surface; this distance was used consistently for all recordings.
+  \item \textbf{Sensor distance:} Empirical tests showed the cleanest and loudest captures when the microphone was placed approximately \textbf{1.5 cm} from the machine surface; this distance was used consistently for all recordings.
 \end{itemize}
 \subsection{Recording procedure}
 \begin{itemize}
@@ -82,51 +78,35 @@ This study used acoustic recordings to capture machine condition signatures. The
 Practical tests revealed:
 \begin{itemize}
     \item Microphones placed at roughly {1.5}{cm} from the machine provided stronger signals and reduced background contamination.
-    \item Acoustic useful content predominantly lies below {12}{kHz} for the compressor under study \cite{Verma2016}; therefore, pre-processing included a high-pass filter (to remove fan hum) and a low-pass filter at {12}{kHz}.
+    \item Acoustic useful content predominantly lies below {12}{kHz} for the compressor under study \cite{Verma2016}; therefore, pre-processing included a high-pass filter (to remove fan noise) and a low-pass filter at {12}{kHz}.
     \item A clipping strategy (segment selection) with overlap helps to choose the most stable portion of each recording for robust analysis (detailed in Section~\ref{sec:preprocess}).
 \end{itemize}
 \section{Pre-Processing}
 \label{sec:preprocess}
 \begin{itemize}
-  \item \textbf{Useful bandwidth:} For this compressor, the informative acoustic content lies largely below 12 kHz; accordingly, later processing uses a low-pass cutoff around 12 kHz and a high-pass ``fan'' filter near 400 Hz to remove known background hums/noises.
+  \item \textbf{Useful bandwidth:} For this compressor, the informative and useful acoustic content lies largely below 12 kHz; accordingly, later processing uses a low-pass cutoff around 12 kHz and a high-pass filter near 400 Hz to remove known background hum noises.
   \item \textbf{Clipping} Each 5 s recording is split into 9, 1 s segments with 50\% overlap; the segment with the minimum standard deviation is selected for analysis to avoid transient spikes and to choose the most stable portion of the recording.
   \item \textbf{Smoothing \& normalization:} A simple moving-average smoother removes impulsive outliers, and a robust min–max style normalization (ignore 0.025\% extreme samples at both tails when computing min/max) is used so that scaling is not driven by rare outliers.
-  \item \textbf{Storage \& labeling:} Store raw .dat (24-bit PCM) files to ensure later classification stages.
+  \item \textbf{Storage \& labeling:} Store raw .dat (24-bit PCM) files to ensure later classification stages. Our dataset comprises 8 classes and 225 recordings each, resulting in a total of 1800 recordings. 
 \end{itemize}
 \begin{figure}[H]
     \centering
     \includegraphics[width=1\linewidth]{Diagrams/preprocessing.png}
-    \caption{Preprocessing steps}
+    \caption{Pre-processing steps}
     \label{fig:preprocessing steps}
 \end{figure}
 \section{Feature Extraction}
 \subsection{Time Domain Features}
-Time-domain features are directly calculated from the raw waveform of the signal. They capture properties like energy, amplitude variations, and statistical measures (e.g., mean, RMS, skewness, kurtosis). These features are simple to compute and give useful information about the overall vibration or acoustic pattern. In the compressor monitoring study, time-domain measures help detect faults because damaged components often change the amplitude distribution or introduce irregular spikes in the acoustic waveform.
+Time-domain features are found by looking directly at the original signal shape. These features include things like energy, changes in amplitude, and simple statistics such as the mean, root mean square (RMS), skewness, and kurtosis. Time-domain features are quick to calculate and help us understand the general vibration or sound patterns. In compressor monitoring, they are useful for spotting problems, since damage usually changes amplitude patterns or causes unusual spikes in the sound signal.
 \subsection{Frequency Domain Features}
-Frequency-domain features are obtained by transforming the signal using the Fourier Transform. These features describe how the signal’s energy is distributed across different frequencies. For compressors, faults such as leakage or valve wear often create characteristic frequency peaks or harmonics. Features like spectral centroid, peak frequency, and band power are extracted. They are more reliable than raw time signals when fault signatures appear as periodic or harmonic patterns buried in noise.
+Frequency-domain features are calculated by using the Fourier Transform on the signal. This process helps us see how the signal's energy is spread out across different frequency ranges. In compressors, problems like leakage or worn valves can cause certain frequencies or harmonics to stand out. Features like spectral centroid, peak frequency, and band power can be more reliable than time-domain features, especially when faults show up as repeating or harmonic patterns in noisy data.
 \subsection{Time Frequency Domain Features}
-Time–frequency features capture how the signal’s frequency content changes over time. Unlike plain frequency analysis, this approach helps detect transient or non-stationary events (short-lived bursts or shifts). Since compressor signals are often non-stationary, these features are crucial. By mapping both time and frequency information, they highlight patterns linked to specific faults, such as short-duration impacts or sudden frequency shifts that ordinary Fourier analysis might miss.
+Time–frequency features show how the signal's frequency content changes over time. Unlike regular frequency analysis, this method helps us find short bursts or sudden changes in the signal. Since compressor signals often change over time, these features are important. By combining time and frequency details, time–frequency features can reveal patterns linked to certain faults, like brief impacts or sudden frequency shifts that standard Fourier analysis might miss.
 \section{Feature Selection}
 \label{sec:features}
-Principal Component Analysis (PCA) is a dimensionality reduction technique that
-transforms a large set of correlated features into a smaller set of uncorrelated
-variables, known as principal components. Each component is an orthogonal
-projection of the original features and is ranked according to the variance it
-captures from the dataset. This allows redundant and less informative features
-to be compressed into a compact representation while still retaining the
-dominant structure of the data.
-
-In the context of acoustic fault diagnosis, where hundreds of features are
-extracted across time, frequency, and wavelet domains, directly using the full
-feature set increases computational burden and may reduce classifier performance
-due to redundancy. To address this, we apply PCA to the $286$-dimensional feature
-vectors, standardize them, and project them into a lower-dimensional subspace.
-The number of retained components was varied (from 10 to 200) to evaluate the
-trade-off between dimensionality and classification accuracy. These principal
-components were then used as inputs to the Support Vector Machine (SVM)
-classifiers under both One-Against-All (OAA) and One-Against-One (OAO) schemes. This
-approach ensures faster computation, reduces overfitting, and maintains the
-ability to distinguish between healthy and faulty compressor states.
+Principal Component Analysis (PCA) is a dimensionality reduction technique that transforms a large set of correlated features into a smaller set of uncorrelated variables, known as principal components. A large collection of correlated features is reduced in dimensionality using Principal Component Analysis (PCA), which yields a smaller set of uncorrelated variables called principal components. Every component is ranked based on the variance it extracts from the dataset and is an orthogonal projection of the original features. This preserves the dominant structure of the data while enabling the compression of redundant and less informative features into a compact representation.
+Using the entire feature set directly increases computational load and may result in lower classifier performance due to redundancy in the context of diagnosing acoustic faults, where hundreds of features are extracted across time, frequency, and wavelet domains.  We standardize the $286$-dimensional feature vectors, apply PCA to them, and project them into a lower-dimensional subspace in order to solve this.
+ To assess the trade-off between dimensionality and classification accuracy, the number of retained components was changed from 10 to 200.  The Support Vector Machine (SVM) classifiers were then trained using these principal components as inputs in both One-Against-One (OAO) and One-Against-All (OAA) schemes.  This method guarantees quicker computation, lessens overfitting, and preserves the capacity to discriminate between compressor states that are healthy and those that are not.
 % \begin{figure}[H]
 %     \centering
 %     \includegraphics[width=1\linewidth]{Diagrams/pcavar.png}
@@ -135,25 +115,24 @@ ability to distinguish between healthy and faulty compressor states.
 % \end{figure}
 \section{Use Case}
 
-In this study, the proposed pipeline was implemented on a single-stage reciprocating air compressor testbed with multiple seeded fault conditions. The dataset consisted of acoustic recordings collected from carefully chosen sensor locations after Sensitive Position Analysis (SPA). Each recording was pre-processed, decomposed, and transformed into a set of statistical and signal-processing features. In total, 286 features were extracted per segment covering time, frequency, and time–frequency domains. Principal Component Analysis (PCA) was then used to reduce redundancy and compress the feature space into a compact representation. 
-
+In this study, the proposed pipeline was tested on a single-stage reciprocating air compressor testbed with multiple seeded fault conditions.  The dataset consisted of acoustic recordings obtained from carefully selected sensor locations following Sensitive Position Analysis (SPA).  Each recording underwent pre-processing, decomposition, and transformation into a collection of statistical and signal-processing features.  A total of 286 features were extracted per segment, covering the time, frequency, and time-frequency domains.  The redundancy was then reduced using Principal Component Analysis (PCA), which compressed the feature space into a compact representation. 
 
 \subsection{Classes, labels and Test-Train Split}
-The dataset was labeled into eight distinct classes: one healthy state and seven different fault modes (including leakage, valve defects, and loose components). These labeled feature vectors were split into training and testing sets, following the standard 70:30 test-train split, ensuring balanced representation across classes. The reduced feature set was then used to train Support Vector Machine (SVM) classifiers under both One-Against-All (OAA) and One-Against-One (OAO) schemes. This experimental setup provides a realistic use case where acoustic-based monitoring can distinguish multiple fault types with high reliability using only a single microphone location.
+
+The dataset was labeled into eight distinct classes: one healthy state and seven different fault modes. These labeled feature vectors were split into training and testing sets, following the standard 70:30 test-train split, ensuring balanced representation across classes. 
+
+The reduced feature set was then used to train Support Vector Machine (SVM) classifiers under both One-Against-All (OAA) and One-Against-One (OAO) schemes. This experimental setup provides a realistic use case where acoustic-based monitoring can distinguish multiple fault types with high reliability using only a single microphone location.
+
+
 \begin{figure}[H]
     \centering
     \includegraphics[width=1\linewidth]{Diagrams/split.png}
-    \caption{test train split}
+    \caption{Test Train Split}
     \label{fig:split}
 \end{figure}
-\subsection{Techniques Used}
-
-The proposed pipeline was implemented in MATLAB. Acoustic recordings were pre-processed, segmented, and transformed into features using the wavelet scattering transform. This approach applies cascaded wavelet filter banks to capture time--frequency information while discarding irrelevant variability. The extracted scattering coefficients were reduced using Principal Component Analysis (PCA) before being passed to Support Vector Machine (SVM) classifiers. Both One-Against-All (OAA) and One-Against-One (OAO) classification schemes were applied and evaluated with cross-validation.
-
-% \usepackage[ruled,vlined]{algorithm2e}
-
 \begin{algorithm}[H]
 \caption{Proposed Methodology for Acoustic Fault Diagnosis}
+\label{alg:pipeline}
 \KwIn{Acoustic dataset of compressor signals}
 \KwOut{Predicted fault class}
 
@@ -169,12 +148,17 @@ The proposed pipeline was implemented in MATLAB. Acoustic recordings were pre-pr
 }
 \end{algorithm}
 
+The proposed pipeline was implemented as discussed in the algorithm \ref{alg:pipeline} in MATLAB.  Acoustic recordings were pre-processed, segmented, and converted to features using the wavelet scattering transform.  This method uses cascaded wavelet filter banks to capture time-frequency information while removing irrelevant variability.  The extracted scattering coefficients were reduced with Principal Component Analysis (PCA) before being fed into Support Vector Machine (SVM) classifiers. 5 fold cross-validation was used to evaluate both the One-Against-All (OAA) and One-Against-One (OAO) classification schemes.
+
+% \usepackage[ruled,vlined]{algorithm2e}
+
+
 
 \section{Support Vector Machine (SVM)}
 \label{sec:classification}
 
 
-Support Vector Machines (SVM) were employed as the core classifiers for distinguishing compressor health and fault states. SVM is a powerful supervised learning technique that constructs hyperplanes in a high-dimensional feature space to maximize class separation. In this study, both \textbf{One-Against-All (OAA)} and \textbf{One-Against-One (OAO)} strategies were implemented for handling the multiclass nature of the problem.
+Support Vector Machines (SVM) were employed as the core classifiers for distinguishing compressor health and fault states. SVM is a powerful supervised learning technique that constructs hyperplanes in a high-dimensional feature space to maximize class distinctions. In this study, both \textbf{One-Against-All (OAA)} and \textbf{One-Against-One (OAO)} strategies were implemented for handling the multiclass nature of the problem.
 
 \subsection*{Parameters}
 The following parameters were selected for SVM training after empirical tuning:
@@ -188,7 +172,7 @@ The following parameters were selected for SVM training after empirical tuning:
 \subsection{Cross-Validation}
 A \textbf{5-fold cross-validation} approach was used to evaluate model robustness and reduce overfitting. The dataset was randomly partitioned into 5 equal folds, with 4 folds used for training and 1 fold for testing in each iteration. The reported performance metrics are the average across all folds.
 
-\subsection{Multiclass Strategies}
+\subsection{Multiclass Classification}
 Since the dataset consists of multiple classes (healthy + fault modes), two standard decomposition schemes were applied:
 \subsubsection*{One-Against-All (OAA):} Constructs one classifier per class, distinguishing that class from all remaining classes.
 \subsubsection*{One-Against-One (OAO):} Constructs pairwise classifiers between every possible pair of classes; final prediction is based on majority voting.
@@ -216,22 +200,13 @@ accuracy under 5-fold cross-validation for the two multiclass strategies.
     \label{fig:OAO_results}
 \end{figure}
 
-From the results, it is observed that both OAA and OAO schemes achieved high 
-classification accuracy once the number of PCA components exceeded 
-approximately 40. Accuracy improved sharply from around 91\% (with very few 
-components) to above 98\% when 40--60 features were used, and then gradually 
-saturated. For larger dimensions (above 100 components), performance remained 
-consistently above 99\% across all folds.  
-
-Overall, the OAO approach showed slightly higher stability in accuracy across 
-folds compared to OAA, although both methods reached near-perfect performance. 
-This confirms that PCA effectively compresses the feature space while retaining 
-discriminative information, and SVM classifiers can reliably distinguish 
-between compressor states with a relatively compact representation.
+The results show that OAA and OAO schemes achieve high classification accuracy when the number of PCA components exceeds 40.  Accuracy increased from 91\% (with few components) to over 98\% when 40-60 features were used, gradually saturating.  For larger dimensions (more than 100 components), performance consistently exceeded 99.9\% across all folds.  
+ The OAO approach outperformed OAA in terms of accuracy stability across folds, but both methods achieved near-perfect performance. 
+ This confirms that PCA compresses the feature space while retaining discriminative information, and SVM classifiers can distinguish compressor states with a compact representation.
 
 \section{Conclusion}
 \label{sec:conclusion}
-This study demonstrated an end-to-end methodology for intelligent condition-based monitoring of air compressors using acoustic signals. By combining wavelet scattering features, PCA-based dimensionality reduction, and SVM classifiers, the system achieved near-perfect classification accuracy across multiple fault states. Both OAA and OAO schemes performed reliably, with OAO showing slightly more stable results across folds. The findings confirm that acoustic sensing, when paired with robust feature extraction and machine learning, provides a practical and accurate solution for fault diagnosis in industrial settings.
+This study presented an end-to-end methodology for intelligent condition-based monitoring of air compressors via acoustic signals.  Using wavelet scattering features, PCA-based dimensionality reduction, and SVM classifiers, the system achieved near-perfect classification accuracy across multiple fault states.  Both OAA and OAO schemes performed well, with OAO producing slightly more consistent results across folds.  The results show that acoustic sensing, when combined with robust feature extraction and machine learning, provides a practical and accurate solution for fault diagnosis in industrial settings.
 
 \begin{thebibliography}{1}
 \bibitem{Verma2016}
