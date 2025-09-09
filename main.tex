@@ -15,7 +15,6 @@
 \usetikzlibrary{shapes.geometric, arrows.meta, positioning}
 \usepackage{pgfplots}
 \pgfplotsset{compat=1.17}
-\usepackage{algorithm}
 \usepackage{algorithmic}
 \usepackage[ruled,vlined]{algorithm2e}
 
@@ -33,10 +32,7 @@ Acoustic Signals for Air Compressors\\
 \newpage
 \begin{multicols}{2}
 \section{Abstract}
-\textit{Early detection of machine faults is vital to prevent costly downtime and ensure workplace safety. This paper presents a practical, data-driven process for building acoustic-based fault-diagnosis systems for reciprocating air compressors. The proposed pipeline is deliberately end-to-end: it covers how to collect acoustic data, how to choose the best microphone location, how to clean and normalize the recordings, which time/frequency/time–frequency features to extract, how to pick a compact yet informative feature set, and how to train and evaluate classifiers for multi-state fault recognition using SVM.
-Overall, the paper demonstrates that a carefully designed acoustic monitoring pipeline can accurately and efficiently detect multiple fault modes using only one sensor location, making the approach attractive for cost-sensitive condition-based maintenance deployments main experimental paper used as the source is \cite{Verma2016}.}
-
-
+Early detection of machine faults is vital to prevent costly downtime and ensure workplace safety, as the source is \cite{Verma2016}. This paper presents a practical, data-driven process for building acoustic-based fault-diagnosis systems for reciprocating air compressors. The proposed pipeline is deliberately end-to-end: it covers how to collect acoustic data, how to choose the best microphone location, how to clean and normalize the recordings, which time/frequency/time–frequency features to extract, how to pick a compact yet informative feature set, and how to train and evaluate classifiers for multi-state fault recognition using SVM.
 \section{Introduction}
 Rotating and reciprocating machines (compressors, motors, pumps) often show early warning signs in the form of acoustic or vibration signatures. Detecting faults early avoids costly downtime and safety hazards. Intelligent Condition-based monitoring (ICBM) aims to recognize incipient faults from sensory streams (acoustics, vibration, temperature, etc.) and thereby trigger maintenance before catastrophic failure. Acoustic measurements are especially attractive because they are typically easy to install and are relatively less sensitive to structural resonances compared to vibration sensors; however, acoustic recordings are often noisy and non-stationary, which makes automated analysis challenging.
 
